@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "fx": "hlsl",
+        "tuple": "cpp",
+        "*.tcc": "cpp",
+        "fstream": "cpp",
+        "iosfwd": "cpp",
+        "memory": "cpp",
+        "vector": "cpp"
+    },
+
+    "C_Cpp.default.includePath": ["./source/"]
+}
