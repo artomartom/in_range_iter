@@ -2,18 +2,13 @@
 #define STABLE
 #include <range.hpp>
 
-TEST(test_test, passes)
+TEST(test_test, passest1)
 {
     EXPECT_FALSE(false);
 }
-
-TEST(test_test, fails)
-{
-    EXPECT_FALSE(true);
-}
 using namespace ranges;
 
-TEST(unstable, no_step)
+TEST(unstable, t1)
 {
     for (int i{}; auto e : in_range(0, 10))
     {
@@ -23,7 +18,7 @@ TEST(unstable, no_step)
         i++;
     }
 }
-TEST(unstable, step)
+TEST(unstable_step, t1)
 {
     for (int i{}; auto e : in_range(0, 10, 1))
     {
@@ -33,8 +28,7 @@ TEST(unstable, step)
         i++;
     }
 }
-
-TEST(unstable, reversed)
+TEST(unstable_reversed, t1)
 {
     for (int i{9}; auto e : reversed_in_range(10, 0))
     {
@@ -44,10 +38,9 @@ TEST(unstable, reversed)
         i--;
     }
 }
-TEST(unstable, reversed_step)
+TEST(unstable_step_reversed, t1)
 {
-
-    for (int i{9}; auto e : reversed_in_range(0, 10, 1))
+    for (int i{9}; auto e : reversed_in_range(10, 0))
     {
         ASSERT_TRUE(i < 10);
         ASSERT_TRUE(i >= 0);
@@ -55,11 +48,12 @@ TEST(unstable, reversed_step)
         i--;
     }
 }
-   
+
 #ifdef STABLE
-TEST(stable, no_step_problem_case)
+
+TEST(stable, t1)
 {
-    for (int i{}; auto e : in_range(0, 10, stable{}))
+    for (int i{}; auto e : in_range(0, 10))
     {
         ASSERT_TRUE(i < 10);
         ASSERT_TRUE(i >= 0);
@@ -67,9 +61,9 @@ TEST(stable, no_step_problem_case)
         i++;
     }
 }
-TEST(stable, step_problem_case)
+TEST(stable_step, t1)
 {
-    for (int i{}; auto e : in_range(0, 10, 1, stable{}))
+    for (int i{}; auto e : in_range(0, 10, 1))
     {
         ASSERT_TRUE(i < 10);
         ASSERT_TRUE(i >= 0);
@@ -77,10 +71,9 @@ TEST(stable, step_problem_case)
         i++;
     }
 }
-
-TEST(stable, reversed_problem_case)
+TEST(stable_reversed, t1)
 {
-    for (int i{9}; auto e : reversed_in_range(10, 0, stable{}))
+    for (int i{9}; auto e : reversed_in_range(10, 0))
     {
         ASSERT_TRUE(i < 10);
         ASSERT_TRUE(i >= 0);
@@ -88,10 +81,9 @@ TEST(stable, reversed_problem_case)
         i--;
     }
 }
-TEST(stable, reversed_step_problem_case)
+TEST(stable_step_reversed, t1)
 {
-
-    for (int i{9}; auto e : reversed_in_range(0, 10, 1, stable{}))
+    for (int i{9}; auto e : reversed_in_range(10, 0))
     {
         ASSERT_TRUE(i < 10);
         ASSERT_TRUE(i >= 0);
@@ -99,4 +91,5 @@ TEST(stable, reversed_step_problem_case)
         i--;
     }
 }
-#endif //STABLE
+
+#endif // STABLE
