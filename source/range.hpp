@@ -3,7 +3,24 @@
 
 namespace ranges
 {
+
+    namespace util
+    {
+
+        template <typename What, typename... Args>
+        struct is_present
+        {
+            static constexpr bool value{(std::is_same_v<What, Args> || ...)};
+        };
+    };
+
     struct stable
+    {
+    };
+    struct step
+    {
+    };
+    struct reversed
     {
     };
 
@@ -21,196 +38,165 @@ namespace ranges
     class range //  range object
     {
 
-        using index_t = range_iterator_trait<T>::value_type;
-
     public:
         struct iterator
         {
         public:
-            explicit iterator(index_t index)
+            explicit iterator(T index)
                 : m_index(index){};
             iterator() = delete;
             virtual ~iterator() = default;
 
             bool operator!=(const iterator &other) const noexcept { return m_index > other.m_index; };
-            index_t &operator++() noexcept { return ++m_index; };
-            index_t operator*() noexcept { return m_index; };
+            T &operator++() noexcept { return ++m_index; };
+            T operator*() noexcept { return m_index; };
 
         protected:
-            index_t m_index{};
+            T m_index{};
         };
 
-        template <typename U> // factory
-        friend range<U> in_range(U begin, U end) noexcept;
-        template <typename U> // factory
-        friend range<U> in_range(U begin, U end, stable) noexcept;
+        template <typename U, typename... Args> // factory
+        friend auto in_range(U begin, U end, Args... args) noexcept;
 
         range::iterator begin() const noexcept { return range::iterator{this->m_begin}; };
         range::iterator end() const noexcept { return range::iterator{this->m_end}; };
 
     protected:
-        explicit range(index_t begin, index_t end) noexcept
+        template <typename... Args>
+        explicit range(T begin, T end, Args...) noexcept
             : m_begin(begin), m_end(end){};
-        index_t m_begin;
-        index_t m_end;
+        T m_begin;
+        T m_end;
     };
     template <typename T>
     class reversed_range : public range<T> //  range object
     {
 
-        using index_t = range_iterator_trait<T>::value_type;
-
     public:
         struct iterator : public range<T>::iterator
         {
         public:
-            explicit iterator(index_t index) noexcept
+            explicit iterator(T index) noexcept
                 : range<T>::iterator{index} {};
             bool operator!=(const iterator &other) const noexcept { return this->m_index != other.m_index; };
-            index_t &operator++() noexcept { return --iterator::m_index; };
+            T &operator++() noexcept { return --iterator::m_index; };
         };
-
-        template <typename U> // factory
-        friend reversed_range<U> reversed_in_range(U begin, U end) noexcept;
-        template <typename U> // factory
-        friend reversed_range<U> reversed_in_range(U begin, U end, stable) noexcept;
+        template <typename U, typename... Args> // factory
+        friend auto in_range(U begin, U end, Args... args) noexcept;
 
         reversed_range::iterator begin() const noexcept { return reversed_range::iterator{this->m_begin}; };
         reversed_range::iterator end() const noexcept { return reversed_range::iterator{this->m_end}; };
 
     protected:
-        explicit reversed_range(index_t begin, index_t end) noexcept
+        template <typename... Args>
+        explicit reversed_range(T begin, T end, Args...) noexcept
             : range<T>{begin - 1, end} {};
     };
     template <typename T>
     class step_range : protected range<T> //  range object
     {
 
-        using index_t = range_iterator_trait<T>::value_type;
-
     public:
         struct iterator : public range<T>::iterator
         {
         public:
-            explicit iterator(index_t index, index_t step) noexcept
+            explicit iterator(T index, T step) noexcept
                 : range<T>::iterator{index},
                   m_step{step} {};
-            index_t &operator++() noexcept { return this->m_index += m_step; };
+            T &operator++() noexcept { return this->m_index += m_step; };
 
         protected:
-            index_t m_step;
+            T m_step;
         };
 
-        template <typename U> // factory
-        friend step_range<U> in_range(U begin, U end, U step) noexcept;
-        template <typename U> // factory
-        friend step_range<U> in_range(U begin, U end, U step, stable) noexcept;
+        template <typename U, typename... Args> // factory
+        friend auto in_range(U begin, U end, Args... args) noexcept;
 
         step_range::iterator begin() const noexcept { return step_range::iterator{this->m_begin, this->m_step}; };
         step_range::iterator end() const noexcept { return step_range::iterator{this->m_end, this->m_step}; };
 
     protected:
-        explicit step_range(index_t begin, index_t end, index_t step) noexcept
+        template <typename... Args>
+        explicit step_range(T begin, T end, T step, Args...) noexcept
             : range<T>{begin, end},
               m_step{step} {};
-        index_t m_step;
+        T m_step;
     };
     template <typename T>
     class reversed_step_range : protected range<T> //  range object
     {
 
-        using index_t = range_iterator_trait<T>::value_type;
-
     public:
         struct iterator : public step_range<T>::iterator
         {
         public:
-            explicit iterator(index_t index, index_t step) noexcept
+            explicit iterator(T index, T step) noexcept
                 : step_range<T>::iterator{index, step} {};
             bool operator!=(const iterator &other) const noexcept { return this->m_index >= other.m_index; };
-            index_t &operator++() noexcept { return iterator::m_index += this->m_step; };
+            T &operator++() noexcept { return iterator::m_index += this->m_step; };
         };
 
-        template <typename U> // factory
-        friend reversed_step_range<U> reversed_in_range(U begin, U end, U step) noexcept;
-        template <typename U> // factory
-        friend reversed_step_range<U> reversed_in_range(U begin, U end, U step, stable) noexcept;
+        template <typename U, typename... Args> // factory
+        friend auto in_range(U begin, U end, Args... args) noexcept;
 
         reversed_step_range::iterator begin() const noexcept { return reversed_step_range::iterator{this->m_begin, this->m_step}; };
         reversed_step_range::iterator end() const noexcept { return reversed_step_range::iterator{this->m_end, this->m_step}; };
 
     protected:
-        explicit reversed_step_range(index_t begin, index_t end, index_t step) noexcept
+        template <typename... Args>
+        explicit reversed_step_range(T begin, T end, T step, Args...) noexcept
             : step_range<T>{begin - 1, end, step} {};
     };
 
     //  outside  decls for friend function (cause of wierd c++ friend func visibility)
     // factories
 
-    template <typename U>
-    range<U> in_range(U begin, U end) noexcept
+    template <typename U, typename... Args>
+    auto in_range(U begin, U end, Args... args) noexcept
     {
-        return range<U>{begin, end};
-    };
-    template <typename U>
-    range<U> in_range(U begin, U end, stable) noexcept
-    {
-        return range<U>{};
-    };
-    template <typename U>
-    reversed_range<U> reversed_in_range(U begin, U end) noexcept
-    {
-        return reversed_range<U>{begin, end};
-    };
-    template <typename U>
-    reversed_range<U> reversed_in_range(U begin, U end, stable) noexcept
-    {
-        return reversed_range<U>{};
-    };
-    template <typename U>
-    step_range<U> in_range(U begin, U end, U step) noexcept
-    {
-        return step_range<U>{begin, end, step};
-    };
-    template <typename U>
-    step_range<U> in_range(U begin, U end, U step, stable) noexcept
-    {
-        return step_range<U>{};
-    };
-    template <typename U>
-    reversed_step_range<U> reversed_in_range(U begin, U end, U step) noexcept
-    {
-        return reversed_step_range<U>{begin, end, step};
-    };
-    template <typename U>
-    reversed_step_range<U> reversed_in_range(U begin, U end, U step, stable) noexcept
-    {
-        return reversed_step_range<U>{};
-    };
+        constexpr bool use_stable{util::is_present<stable, Args...>::value};
+        constexpr bool use_step{util::is_present<step, Args...>::value};
+        constexpr bool use_reversed{util::is_present<reversed, Args...>::value};
+        if constexpr (use_stable)
+        {
+            return range{begin, end};
+        }
+        else
+        {
 
+            if constexpr (use_step && use_reversed)
+                return reversed_step_range{begin, end, args...};
+            if constexpr (use_step)
+                return step_range{begin, end, args...};
+            if constexpr (use_reversed)
+                return reversed_range{begin, end, args...};
+            else
+                return range{begin, end, args...};
+        }
+    };
         // stable factory
 #undef STABLE
 #ifdef STABLE
-    inline range in_range(range::index_t begin, range::index_t end, stable) noexcept
+    inline range in_range(range::T begin, range::T end, stable) noexcept
     {
         if (begin > end)
             return range{end, begin};
         else
             return range{begin, end};
     };
-    inline reversed_range reversed_in_range(reversed_range::index_t begin, reversed_range::index_t end, stable) noexcept
+    inline reversed_range reversed_in_range(reversed_range::T begin, reversed_range::T end, stable) noexcept
     {
         //     if (begin > end)else
         return reversed_range{begin, end};
     };
-    inline step_range in_range(step_range::index_t begin, step_range::index_t end, step_range::index_t step, stable) noexcept
+    inline step_range in_range(step_range::T begin, step_range::T end, step_range::T step, stable) noexcept
     {
         // if(step<0 )       step=-step;
 
         //     if (begin > end)else
         return step_range{begin, end, step};
     };
-    inline reversed_step_range reversed_in_range(reversed_step_range::index_t begin, reversed_step_range::index_t end, reversed_step_range::index_t step, stable) noexcept
+    inline reversed_step_range reversed_in_range(reversed_step_range::T begin, reversed_step_range::T end, reversed_step_range::T step, stable) noexcept
     {
         // if(step<0 )       step=-step;
         //      if (begin > end)else

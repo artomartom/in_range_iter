@@ -21,26 +21,16 @@ struct stable
 template <typename U>
 struct step
 {
-
-    step()
-        : step_size{1} {};
-    step(U step)
-        : step_size{step} {};
-
-    template <typename T, bool activate>
+    template <typename T, bool>
     struct range;
 
-    template <typename T, bool activate>
+    template <typename T, bool>
     struct iterator;
 
     template <typename T>
     struct range<T, true>
     {
-        T step;
-    };
-    template <typename T>
-    struct range<T, false>
-    {
+        T m_step;
     };
     template <typename T>
     struct iterator<T, true>
@@ -48,12 +38,13 @@ struct step
         T m_step;
     };
     template <typename T>
+    struct range<T, false>
+    {
+    };
+    template <typename T>
     struct iterator<T, false>
     {
     };
-
-protected:
-    range<U, true> step_size;
 };
 
 struct reversed
@@ -97,8 +88,8 @@ public:
         T &operator++() noexcept
         {
 
-            if constexpr (util::is_present<step<T>, Flags...>::value)
-                return this->m_index += this->m_step;
+            // if constexpr (util::is_present<step<T>, Flags...>::value)
+            //     return this->m_index += this->m_step;
             return ++m_index;
         };
 
@@ -109,13 +100,14 @@ public:
     template <typename U, typename... Args> // factory
     friend range<U> in_range(U begin, U end, Args... args) noexcept;
 
-    range::iterator begin() const noexcept { return range::iterator{this->m_begin}; };
-    range::iterator end() const noexcept { return range::iterator{this->m_end}; };
+    iterator begin() const noexcept { return iterator{this->m_begin}; };
+    iterator end() const noexcept { return iterator{this->m_end}; };
 
     range(T begin, T end, Flags... flags) noexcept
     {
+        if constexpr (use_step &&)
 
-        m_begin = begin;
+            m_begin = begin;
         m_end = end;
     };
 
@@ -132,18 +124,18 @@ range<U, Args...> in_range(U begin, U end, Args... args) noexcept
 
 int main()
 {
-    auto ran{in_range(0, 10, step{2})};
+    auto ran{in_range(0, 10)};
 
-    // std::cout << sizeof(in_range(0, 10).begin()) << '\n';
-    // std::cout << sizeof(in_range(0, 10).end()) << '\n';
-    // std::cout << sizeof(in_range(0, 10, step{1}).begin()) << '\n';
-    // std::cout << sizeof(in_range(0, 10, step{1}).end()) << '\n';
+    // for (auto i : ran)
+    //     std::cout << i << "\n";
 
-    std::cout << *ran.begin() << '\n';
-    std::cout << *ran.end() << '\n';
+    auto begin{ran.begin()};
+    auto end{ran.end()};
+    std::cout << *begin;
+    std::cout << *end;
 
-    for (auto i : ran)
-        std::cout << i << "\n";
+    for (; begin != end; ++begin)
+        std::cout << *begin << "\n";
 
     // static_assert(sizeof(begin)==sizeof(int));
     // static_assert(sizeof(end)==sizeof(int));

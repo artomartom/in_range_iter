@@ -17,12 +17,8 @@ if(TEST)
 endif(TEST)
 
 
-add_executable(V1_1 ./source/range.v1_1.cpp)
-
-target_compile_options(V1_1 PRIVATE  
-   -Wall
-    
-  )
+#add_executable(V1_1 ./source/range.v1_1.cpp)
+ 
 
 if(BUILD_EXAMPLES)
 
