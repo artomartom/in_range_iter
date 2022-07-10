@@ -98,7 +98,7 @@ namespace ranges
             index_t &operator++() noexcept { return this->m_index += m_step; };
 
         protected:
-            index_t m_step{};
+            index_t m_step;
         };
 
         template <typename U> // factory
@@ -113,7 +113,7 @@ namespace ranges
         explicit step_range(index_t begin, index_t end, index_t step) noexcept
             : range<T>{begin, end},
               m_step{step} {};
-        index_t m_step{};
+        index_t m_step;
     };
     template <typename T>
     class reversed_step_range : protected range<T> //  range object
