@@ -69,8 +69,8 @@ TEST(basic, t1)
 {
     // test_all<char>();
     // test_all<short>();
-    test_all<int>();
-    // test_all<long>();
+    // test_all<int>();
+    test_all<long>();
     // test_all<long long>();
     // test_all<unsigned char>();
     // test_all<unsigned short>();

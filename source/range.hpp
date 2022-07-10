@@ -1,5 +1,7 @@
 #ifndef RANGE_HPP
 #define RANGE_HPP
+#include <type_traits>
+#include <iterator>
 
 namespace ranges
 {
@@ -47,7 +49,7 @@ namespace ranges
             iterator() = delete;
             virtual ~iterator() = default;
 
-            bool operator!=(const iterator &other) const noexcept { return m_index > other.m_index; };
+            bool operator!=(const iterator &other) const noexcept { return m_index < other.m_index; };
             T &operator++() noexcept { return ++m_index; };
             T operator*() noexcept { return m_index; };
 
